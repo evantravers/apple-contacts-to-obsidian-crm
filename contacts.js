@@ -1,9 +1,11 @@
 function groups(contact) {
-  if (contact.groups) {
-    return contact
+  if (contact.groups().length > 1) {
+    return "tags:\n" + contact
       .groups()
       .map(g => g.name())
       .filter(g => g != "Address Book")
+      .map(g => `- ${g}`)
+      .join("\n")
   }
   else { return null }
 }
@@ -16,16 +18,7 @@ function relatedNames(contact) {
   let related = contact.relatedNames();
 
   if (related.length > 0) {
-    return `\nRelated:\n${related.map(r => `- ${stripD(r.label())}: [[${r.value()}]]\n`)}`
-  }
-  else {
-    return null;
-  }
-}
-
-function tags(contact) {
-  if (contact.tags().length > 0) {
-    return JSON.stringify(contact.tags())
+    return `related:\n${related.map(r => `- ${stripD(r.label())}: [[${r.value()}]]`).join("\n")}`
   }
   else {
     return null;
@@ -33,9 +26,15 @@ function tags(contact) {
 }
 
 function meta(contact) {
-  return [tags(contact), groups(contact), relatedNames(contact)]
+  let meta = [groups(contact), relatedNames(contact)]
          .filter(m => m != null)
          .join("\n")
+  if (meta) {
+    return meta + "\n";
+  }
+  else {
+    return "";
+  }
 }
 
 // https://developer.apple.com/library/archive/documentation/LanguagesUtilities/Conceptual/MacAutomationScriptingGuide/ReadandWriteFiles.html
@@ -99,14 +98,11 @@ function writeTextToFile(text, file, overwriteExistingContent) {
 `---
 First Name: ${contact.firstName()}
 Last Name: ${contact.lastName()}
-tags: ${JSON.stringify(groups(contact))}${relatedNames(contact)}
----
+${meta(contact)}---
 
 # ${fullName}
 
 ${contact.note()}`;
-
-        var desktopString = app.pathTo("desktop").toString()
         let file = app.pathTo("home folder", { from: "user domain" }).toString() + `/Desktop/people/${fullName}.md`;
         writeTextToFile(CRM, file, true)
 
