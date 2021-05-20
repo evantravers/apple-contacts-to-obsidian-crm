@@ -1,6 +1,6 @@
 function groups(contact) {
   if (contact.groups().length > 1) {
-    return "tags:\n" + contact
+    return "Tags:\n" + contact
       .groups()
       .map(g => g.name())
       .filter(g => g != "Address Book")
@@ -11,14 +11,14 @@ function groups(contact) {
 }
 
 function stripD(str) {
-  return str.replace(/[!$_]/, '')
+  return str.replaceAll(/(?:_\$!<)|(?:>!\$_)/g, '');
 }
 
 function relatedNames(contact) {
   let related = contact.relatedNames();
 
   if (related.length > 0) {
-    return `related:\n${related.map(r => `- ${stripD(r.label())}: [[${r.value()}]]`).join("\n")}`
+    return `Related:\n${related.map(r => `- ${stripD(r.label())}: [[${r.value()}]]`).join("\n")}`
   }
   else {
     return null;
