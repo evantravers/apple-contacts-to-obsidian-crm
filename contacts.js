@@ -14,6 +14,15 @@ function stripD(str) {
   return str.replaceAll(/(?:_\$!<)|(?:>!\$_)/g, '');
 }
 
+function exists(contact, key, label) {
+  return null
+  if (contact.callableFunction(key)) {
+    return `${label}: ${contact[key]()}`
+  } else {
+    return null
+  }
+}
+
 function relatedNames(contact) {
   let related = contact.relatedNames();
 
@@ -33,7 +42,7 @@ function meta(contact) {
     return meta + "\n";
   }
   else {
-    return "";
+    return null;
   }
 }
 
@@ -73,12 +82,18 @@ function writeTextToFile(text, file) {
 
         console.log(`Processing: ${fullName}`)
 
+        let headers = [
+          `First Name: ${contact.firstName()}`,
+          `Last Name: ${contact.lastName()}`,
+          exists(contact, "organization", "Organization"),
+          `Cardhop: x-cardhop://show?contact=${contact.firstName()}%20${contact.lastName()}`,
+          meta(contact)
+        ]
+
         let CRM =
 `---
-First Name: ${contact.firstName()}
-Last Name: ${contact.lastName()}
-Cardhop: x-cardhop://show?contact=${contact.firstName()}%20${contact.lastName()}
-${meta(contact)}---
+${headers.filter(x => x).join("\n")}
+---
 
 # ${fullName}
 
