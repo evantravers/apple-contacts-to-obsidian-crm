@@ -38,40 +38,19 @@ function meta(contact) {
 }
 
 // https://developer.apple.com/library/archive/documentation/LanguagesUtilities/Conceptual/MacAutomationScriptingGuide/ReadandWriteFiles.html
-function writeTextToFile(text, file, overwriteExistingContent) {
+// https://stackoverflow.com/questions/29076947/jxa-set-utf-8-encoding-when-writing-files
+function writeTextToFile(text, file) {
     try {
 
         // Convert the file to a string
-        var fileString = file.toString()
-
-        // Open the file for writing
-        var openedFile = app.openForAccess(Path(fileString), { writePermission: true })
-
-        // Clear the file if content should be overwritten
-        if (overwriteExistingContent) {
-            app.setEof(openedFile, { to: 0 })
-        }
-
-        // Write the new content to the file
-        app.write(text, { to: openedFile, startingAt: app.getEof(openedFile) })
-
-        // Close the file
-        app.closeAccess(openedFile)
+        // var fileString = file.toString()
+        var str = $.NSString.alloc.initWithUTF8String(text);
+        str.writeToFileAtomicallyEncodingError(file, true, $.NSUTF8StringEncoding, null)
 
         // Return a boolean indicating that writing was successful
         return true
     }
     catch(error) {
-
-        try {
-            // Close the file
-            app.closeAccess(file)
-        }
-        catch(error) {
-            // Report the error is closing failed
-            console.log(`Couldn't close file: ${error}`)
-        }
-
         // Return a boolean indicating that writing was successful
         return false
     }
@@ -98,13 +77,14 @@ function writeTextToFile(text, file, overwriteExistingContent) {
 `---
 First Name: ${contact.firstName()}
 Last Name: ${contact.lastName()}
+Cardhop: x-cardhop://show?contact=${contact.firstName()}%20${contact.lastName()}
 ${meta(contact)}---
 
 # ${fullName}
 
 ${contact.note()}`;
-        let file = app.pathTo("home folder", { from: "user domain" }).toString() + `/Desktop/people/${fullName}.md`;
-        writeTextToFile(CRM, file, true)
+        let file = app.pathTo("home folder", { from: "user domain" }).toString() + `/Desktop/contacts/${fullName}.md`;
+        writeTextToFile(CRM, file)
 
         visited << fullName;
       }
