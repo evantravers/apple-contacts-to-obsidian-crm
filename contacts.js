@@ -15,9 +15,8 @@ function stripD(str) {
 }
 
 function exists(contact, key, label) {
-  return null
-  if (contact.callableFunction(key)) {
-    return `${label}: ${contact[key]()}`
+  if (contact[key]() != null) {
+    return `${label}: [[${contact[key]()}]]`
   } else {
     return null
   }
@@ -39,7 +38,7 @@ function meta(contact) {
          .filter(m => m != null)
          .join("\n")
   if (meta) {
-    return meta + "\n";
+    return meta;
   }
   else {
     return null;
