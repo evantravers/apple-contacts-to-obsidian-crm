@@ -78,7 +78,7 @@ function writeTextToFile(text, file) {
 
   for (contact of Contacts.people()) {
     let fullName = `${contact.firstName()} ${contact.lastName()}`;
-    if (exportable(contact))
+    if (exportable(contact)) {
       if (visited.includes(fullName)) {
         console.log("duplicate name!")
         fullName = fullName + ' 1';
@@ -101,10 +101,11 @@ ${headers.filter(x => x).join("\n")}
 
 # ${fullName}
 
-${contact.note()}`;
-        let file = app.pathTo("home folder", { from: "user domain" }).toString() + `/Desktop/contacts/${fullName}.md`;
-        writeTextToFile(CRM, file)
+${contact.note() || ""}`;
+      let file = app.pathTo("home folder", { from: "user domain" }).toString() + `/Desktop/contacts/${fullName}.md`;
+      writeTextToFile(CRM, file)
 
-    visited << fullName;
+      visited << fullName;
+    }
   }
 })();
