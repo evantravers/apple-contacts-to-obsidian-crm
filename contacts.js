@@ -22,6 +22,11 @@ function exists(contact, key, label) {
   }
 }
 
+function exportable(contact) {
+  return (contact.note() && contact.note() != null) && (!contact.note().match("Address 1 - ")
+         && contact.lastName() != null);
+}
+
 function relatedNames(contact) {
   let related = contact.relatedNames();
 
@@ -73,23 +78,23 @@ function writeTextToFile(text, file) {
 
   for (contact of Contacts.people()) {
     let fullName = `${contact.firstName()} ${contact.lastName()}`;
-    if (contact.note() && contact.note() != null) {
-      if (!contact.note().match("Address 1 - ") && contact.lastName() != null) {
-        if (visited.includes(fullName)) {
-          console.log("duplicate!")
-        }
+    if (exportable(contact))
+      if (visited.includes(fullName)) {
+        console.log("duplicate name!")
+        fullName = fullName + ' 1';
+      }
 
-        console.log(`Processing: ${fullName}`)
+      console.log(`Processing: ${fullName}`)
 
-        let headers = [
-          `First Name: ${contact.firstName()}`,
-          `Last Name: ${contact.lastName()}`,
-          exists(contact, "organization", "Organization"),
-          `Cardhop: "x-cardhop://show?contact=${contact.firstName()}%20${contact.lastName()}"`,
-          meta(contact)
-        ]
+      let headers = [
+        `First Name: ${contact.firstName()}`,
+        `Last Name: ${contact.lastName()}`,
+        exists(contact, "organization", "Organization"),
+        `Cardhop: "x-cardhop://show?contact=${contact.firstName()}%20${contact.lastName()}"`,
+        meta(contact)
+      ]
 
-        let CRM =
+      let CRM =
 `---
 ${headers.filter(x => x).join("\n")}
 ---
@@ -100,8 +105,6 @@ ${contact.note()}`;
         let file = app.pathTo("home folder", { from: "user domain" }).toString() + `/Desktop/contacts/${fullName}.md`;
         writeTextToFile(CRM, file)
 
-        visited << fullName;
-      }
-    }
+    visited << fullName;
   }
 })();
