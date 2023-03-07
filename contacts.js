@@ -23,8 +23,13 @@ function exists(contact, key, label) {
 }
 
 function exportable(contact) {
-  return (contact.note() && contact.note() != null) && (!contact.note().match("Address 1 - ")
-         && contact.lastName() != null);
+  if (contact.lastName() == null) {
+    return false;
+  }
+  if ((contact.note() && contact.note() != null) && (!contact.note().match("Address 1 - "))) {
+    return true;
+  }
+  return false;
 }
 
 function relatedNames(contact) {
