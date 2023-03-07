@@ -96,6 +96,7 @@ function writeTextToFile(text, file) {
         `Last Name: ${contact.lastName()}`,
         exists(contact, "organization", "Organization"),
         `Cardhop: "x-cardhop://show?contact=${contact.firstName()}%20${contact.lastName()}"`,
+        `id: ${contact.id()}`,
         meta(contact)
       ]
 
