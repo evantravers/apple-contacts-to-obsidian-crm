@@ -34,18 +34,6 @@ function relatedNames(contact) {
   }
 }
 
-function meta(contact) {
-  let meta = [groups(contact), relatedNames(contact)]
-         .filter(m => m != null)
-         .join("\n")
-  if (meta) {
-    return meta + "\n";
-  }
-  else {
-    return null;
-  }
-}
-
 // https://developer.apple.com/library/archive/documentation/LanguagesUtilities/Conceptual/MacAutomationScriptingGuide/ReadandWriteFiles.html
 // https://stackoverflow.com/questions/29076947/jxa-set-utf-8-encoding-when-writing-files
 function writeTextToFile(text, file) {
@@ -85,9 +73,13 @@ function writeTextToFile(text, file) {
         let headers = [
           `First Name: ${contact.firstName()}`,
           `Last Name: ${contact.lastName()}`,
-          exists(contact, "organization", "Organization"),
           `Cardhop: x-cardhop://show?contact=${contact.firstName()}%20${contact.lastName()}`,
-          meta(contact)
+          groups(contact)
+        ]
+
+        let footers = [
+          exists(contact, "organization", "Organization"),
+          relatedNames(contact)
         ]
 
         let CRM =
@@ -97,8 +89,11 @@ ${headers.filter(x => x).join("\n")}
 
 # ${fullName}
 
-${contact.note()}`;
-        let file = app.pathTo("home folder", { from: "user domain" }).toString() + `/Desktop/contacts/${fullName}.md`;
+${contact.note()}
+
+${footers.filter(x => x).join("\n")}`;
+
+        let file = app.pathTo("home folder", { from: "user domain" }).toString() + `/Library/Mobile Documents/iCloud~md~obsidian/Documents/wiki/contacts/${fullName}.md`;
         writeTextToFile(CRM, file)
 
         visited << fullName;
