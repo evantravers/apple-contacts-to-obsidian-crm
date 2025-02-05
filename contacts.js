@@ -53,6 +53,21 @@ function writeTextToFile(text, file) {
     }
 }
 
+function dateReplacer(match, p1, offset, string) {
+  // Split the matched date string into components
+  const [month, day, year] = match.split('/');
+  
+  // Convert 2-digit year to 4-digit year
+  const fullYear = year.length === 2 ? '20' + year : year;
+  
+  // Pad month and day with leading zeros if necessary
+  const paddedMonth = month.padStart(2, '0');
+  const paddedDay = day.padStart(2, '0');
+  
+  // Return formatted date string
+  return `[[${fullYear}-${paddedMonth}-${paddedDay}]]`;
+}
+
 (function() {
   let Contacts = Application("Contacts");
   app = Application.currentApplication()
@@ -82,6 +97,8 @@ function writeTextToFile(text, file) {
           relatedNames(contact)
         ]
 
+    note = contact.note().replaceAll(/(\d{1,2})\/(\d{1,2})\/(\d{1,2})/g, dateReplacer)
+
         let CRM =
 `---
 ${headers.filter(x => x).join("\n")}
@@ -89,11 +106,11 @@ ${headers.filter(x => x).join("\n")}
 
 # ${fullName}
 
-${contact.note()}
+${note}
 
 ${footers.filter(x => x).join("\n")}`;
 
-        let file = app.pathTo("home folder", { from: "user domain" }).toString() + `/Library/Mobile Documents/iCloud~md~obsidian/Documents/wiki/contacts/${fullName}.md`;
+        let file = app.pathTo("home folder", { from: "user domain" }).toString() + `/Desktop/contacts/${fullName}.md`;
         writeTextToFile(CRM, file)
 
         visited << fullName;
