@@ -104,8 +104,6 @@ function dateReplacer(match, p1, offset, string) {
 ${headers.filter(x => x).join("\n")}
 ---
 
-# ${fullName}
-
 ${note}
 
 ${footers.filter(x => x).join("\n")}`;
